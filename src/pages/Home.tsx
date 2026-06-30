@@ -8,14 +8,9 @@ import { useGalleryContext } from "../context/GalleryContext";
 
 const Home = () => {
   const {
-    gallery: {
-      images,
-      loading,
-      loaderRef,
-      categories,
-      selectedCategory,
-      filterByCategory,
-    },
+    gallery: { images, loading, loaderRef, categories, selectedCategory },
+    setSearch,
+    gallery,
   } = useGalleryContext();
 
   const { selectedIndex, open, close } = useLightbox();
@@ -31,7 +26,7 @@ const Home = () => {
             className={`category-button ${
               selectedCategory === category ? "active" : ""
             }`}
-            onClick={() => filterByCategory(category)}
+            onClick={() => gallery.filterByCategory(category, setSearch)}
           >
             {category}
           </button>
@@ -43,7 +38,13 @@ const Home = () => {
         <MasonryGrid images={images} onImageClick={open} />
       )}
 
-      {selectedImage && <Lightbox image={selectedImage} onClose={close} />}
+      {selectedImage && (
+        <Lightbox
+          images={images}
+          initialSlide={selectedIndex}
+          onClose={close}
+        />
+      )}
 
       <InfiniteLoader loaderRef={loaderRef} loading={loading} />
     </>

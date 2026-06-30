@@ -3,19 +3,32 @@ import { useEffect, useMemo, useState } from "react";
 import { getCollections } from "../services/collectionService";
 
 import type { Collection } from "../types/collection";
-import useLightbox from "./useLightbox";
+import { DEBOUNCE_DELAY } from "../utils/constants";
+import useDebounce from "./useDebounce";
 
-const useCollections = () => {
+const useCollections = (search: string) => {
+  const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  const {
-    open,
-    close,
-  } = useLightbox();
   const [filteredCollections, setFilteredCollections] = useState<Collection[]>([]);
 
   const [selectedCategory, setSelectedCategory] = useState("All Collections");
 
+  const [selectedCollectionIndex, setSelectedCollectionIndex] =
+    useState<number | null>(null);
+
+  const open = (index: number) => {
+    setSelectedCollectionIndex(index);
+  };
+
+  const close = () => {
+    setSelectedCollectionIndex(null);
+  };
+
+  const selectedCollection =
+    selectedCollectionIndex !== null
+      ? collections[selectedCollectionIndex]
+      : null;
 
   useEffect(() => {
     const fetchCollections = async () => {
@@ -23,7 +36,6 @@ const useCollections = () => {
         const data = await getCollections();
 
         setCollections(data);
-        setFilteredCollections(data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -34,6 +46,29 @@ const useCollections = () => {
     fetchCollections();
   }, []);
 
+  useEffect(() => {
+    const query = debouncedSearch.trim().toLowerCase();
+    let nextCollections = collections;
+
+    if (selectedCategory !== "All Collections") {
+      nextCollections = nextCollections.filter(
+        (collection) => collection.title === selectedCategory
+      );
+    }
+
+    if (!query) {
+      setFilteredCollections(nextCollections);
+      return;
+    }
+
+    const filteredBySearch = nextCollections.filter((collection) => {
+      const haystack = `${collection.title} ${collection.description ?? ""} ${collection.user.name}`.toLowerCase();
+      return haystack.includes(query);
+    });
+
+    setFilteredCollections(filteredBySearch);
+  }, [collections, debouncedSearch, selectedCategory]);
+
   const categories = useMemo(() => {
     return [
       "All Collections",
@@ -43,17 +78,6 @@ const useCollections = () => {
 
   const filterCollections = (category: string) => {
     setSelectedCategory(category);
-
-    if (category === "All Collections") {
-      setFilteredCollections(collections);
-      return;
-    }
-
-    setFilteredCollections(
-      collections.filter(
-        (collection) => collection.title === category
-      )
-    );
   };
 
   return {
@@ -63,6 +87,9 @@ const useCollections = () => {
     filterCollections,
     loading,
     open,
+    selectedCollection,
+    selectedCollectionIndex,
+    close,
   };
 };
 

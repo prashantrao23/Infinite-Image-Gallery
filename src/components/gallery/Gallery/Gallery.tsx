@@ -13,10 +13,11 @@ const Gallery = ({ images }: GalleryProps) => {
     <section className="gallery">
       {images.map((image) => (
         <ImageCard
-              key={image.id}
-              image={image} index={0} onClick={function (index: number): void {
-                  throw new Error("Function not implemented.");
-              } }        />
+          key={image.id}
+          image={image}
+          index={0}
+          onClick={() => undefined}
+        />
       ))}
     </section>
   );

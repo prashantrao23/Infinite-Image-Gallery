@@ -1,5 +1,6 @@
 import CollectionItem from "../components/gallery/CollectionItem/CollectionItem";
 import SkeletonGallery from "../components/gallery/SkeletonGallery/SkeletonGallery";
+import CollectionLightbox from "../components/lightbox/Lightbox/CollectionLightbox";
 
 import { useGalleryContext } from "../context/GalleryContext";
 
@@ -12,6 +13,8 @@ const Collections = () => {
       filterCollections,
       loading,
       open,
+      close,
+      selectedCollection,
     },
   } = useGalleryContext();
 
@@ -54,6 +57,9 @@ const Collections = () => {
           ))
         )}
       </div>
+      {selectedCollection && (
+        <CollectionLightbox collection={selectedCollection} onClose={close} />
+      )}
     </>
   );
 };

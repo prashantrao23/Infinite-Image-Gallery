@@ -1,39 +1,20 @@
-import { useCallback, useState } from "react";
-// import type { Image } from "../types/image";
+import { useState } from "react";
 
 const useLightbox = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const open = useCallback((index: number) => {
+  const open = (index: number) => {
     setSelectedIndex(index);
-  }, []);
+  };
 
-  const close = useCallback(() => {
+  const close = () => {
     setSelectedIndex(null);
-  }, []);
-
-  const next = useCallback((length: number) => {
-    setSelectedIndex(prev => {
-      if (prev === null) return null;
-
-      return (prev + 1) % length;
-    });
-  }, []);
-
-  const previous = useCallback((length: number) => {
-    setSelectedIndex(prev => {
-      if (prev === null) return null;
-
-      return (prev - 1 + length) % length;
-    });
-  }, []);
+  };
 
   return {
     selectedIndex,
     open,
     close,
-    next,
-    previous,
   };
 };
 

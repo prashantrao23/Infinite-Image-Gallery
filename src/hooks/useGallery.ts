@@ -23,8 +23,8 @@ export const IMAGE_CATEGORIES = [
   "Art",
 ] as const;
 
-const useGallery = () => {
-  const [search, setSearch] = useState("");
+const useGallery = (search: string) => {
+  // const [search, setSearch] = useState("");
   const [images, setImages] = useState<Image[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -87,26 +87,21 @@ const useGallery = () => {
     onLoadMore: loadMore,
   });
 
-  const filterByCategory = (category: string) => {
-  setSelectedCategory(category);
+  const filterByCategory = (
+    category: string,
+    setSearch: (value: string) => void
+  ) => {
+    setSelectedCategory(category);
 
-  // Clear existing images
-  setImages([]);
+    setImages([]);
+    setPage(1);
+    setHasMore(true);
 
-  // Reset pagination
-  setPage(1);
-  setHasMore(true);
-
-  if (category === "All") {
-    setSearch("");
-  } else {
-    setSearch(category);
-  }
-};
+    setSearch(category === "All" ? "" : category);
+  };
 
   return {
     search,
-    setSearch,
     images,
     loading,
     loaderRef,

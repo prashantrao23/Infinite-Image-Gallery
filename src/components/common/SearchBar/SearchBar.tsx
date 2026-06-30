@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useLocation } from "react-router-dom";
+
 import "./SearchBar.scss";
 
 interface SearchBarProps {
@@ -7,27 +9,24 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ value, onChange }: SearchBarProps) => {
+  const location = useLocation();
 
-  const isCollectionsPage = window.location.pathname === "/collections";
-  const [searchPlaceholder, setSearchPlaceholder] = useState("Search for Inspiration...");
-  
-  useEffect(() => {
-    if (isCollectionsPage) {
-      setSearchPlaceholder("Search collections...");
-    } else {
-      setSearchPlaceholder("Search for Inspiration...");
+  const placeholder = useMemo(() => {
+    switch (location.pathname) {
+      case "/collections":
+        return "Search collections...";
+
+      default:
+        return "Search for inspiration...";
     }
-  }, [isCollectionsPage]);
+  }, [location.pathname]);
 
   return (
     <div className="search-bar">
       <input
-        type="text"
-        placeholder={searchPlaceholder}
+        placeholder={placeholder}
         value={value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onChange(e.target.value)
-        }
+        onChange={(e) => onChange(e.target.value)}
       />
     </div>
   );
