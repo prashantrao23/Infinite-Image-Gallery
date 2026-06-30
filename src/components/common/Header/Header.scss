@@ -1,0 +1,70 @@
+.header {
+  padding: 0.875rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e2e2;
+  backdrop-filter: blur(24px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0px 1px 4px rgb(0 0 0 / 5%);
+  flex-direction: column;
+
+  .header-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    .brand {
+      font-family: "Geist", sans-serif;
+      font-weight: 700;
+      font-size: 3rem;
+      line-height: normal;
+      text-decoration: none;
+      text-transform: uppercase;
+      color: #000;
+      letter-spacing: -0.05em;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .nav-link {
+      font-weight: 400;
+      font-size: 1rem;
+      line-height: normal;
+      color: #444748;
+      text-decoration: none;
+      line-height: 1.625rem;
+      padding: 0.25rem 0rem;
+      &:hover {
+        color: #000;
+      }
+      &.active {
+        color: #000;
+        font-weight: 700;
+        border-bottom: 2px solid #000;
+      }
+    }
+  }
+  .search-bar-container {
+    flex: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: 0.875rem 1.5rem;
+    gap: 1.5rem;
+    flex-direction: row;
+  }
+}
+@media (min-width: 992px) {
+  .header {
+    padding: 0.875rem 3rem;
+    gap: 2rem;
+  }
+}

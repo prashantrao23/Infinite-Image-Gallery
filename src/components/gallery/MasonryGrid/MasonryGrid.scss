@@ -1,0 +1,50 @@
+.masonry-grid {
+    // column-count: 4;
+    // column-gap: 20px;
+    // padding: 3rem 0rem;
+    // display: grid;
+    // grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    // grid-auto-rows: masonry;
+    // grid-auto-flow: dense;
+    // gap: 20px;
+
+//     width: 100%;
+//     display: -webkit-box;
+//     display: -webkit-flex;
+//     display: -ms-flexbox;
+//     display: flex;
+//     -webkit-box-flex-flow: column wrap;
+//     -webkit-flex-flow: column wrap;
+//     -ms-flex-flow: column wrap;
+//     flex-flow: column wrap;
+//     -webkit-align-content: flex-start;
+//     -ms-flex-line-pack: flex-start;
+//     align-content: flex-start;
+//     box-sizing: border-box;
+
+//     margin: calc(0px - (16px / 2));
+//         height: calc(3774px + 16px);
+}
+
+// .masonry-grid>* {
+//     break-inside: avoid;
+//     margin-bottom: 20px;
+// }
+
+// @media (max-width:1200px) {
+//     .masonry-grid {
+//         column-count: 3;
+//     }
+// }
+
+// @media (max-width:900px) {
+//     .masonry-grid {
+//         column-count: 2;
+//     }
+// }
+
+// @media (max-width:600px) {
+//     .masonry-grid {
+//         column-count: 1;
+//     }
+// }

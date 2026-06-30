@@ -1,0 +1,24 @@
+.search-bar {
+    width: 100%;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.5rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 400;
+    border: 1px solid var(--border);
+    border-radius: 30px;
+
+    outline: none;
+
+    transition: var(--transition);
+    background-image: url("../../../assets/search-icon.svg");
+    background-repeat: no-repeat;
+    background-position: left 18px center;
+    background-size: 1rem 1rem;
+}
+
+.search-bar input:focus {
+    border-color: var(--primary);
+}
