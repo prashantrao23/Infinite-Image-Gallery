@@ -1,28 +1,54 @@
+import { lazy, Suspense, useMemo } from "react";
 import CollectionItem from "../components/gallery/CollectionItem/CollectionItem";
 import SkeletonGallery from "../components/gallery/SkeletonGallery/SkeletonGallery";
-import CollectionLightbox from "../components/lightbox/Lightbox/CollectionLightbox";
-
 import { useGalleryContext } from "../context/GalleryContext";
+import useCollections from "../hooks/useCollections";
+import type { LightboxSlideItem } from "../components/lightbox/Lightbox";
+
+// Lazy-load the heavy Lightbox component (includes Swiper)
+const Lightbox = lazy(() => import("../components/lightbox/Lightbox"));
 
 const Collections = () => {
+  const { search } = useGalleryContext();
   const {
-    collections: {
-      collections,
-      categories,
-      selectedCategory,
-      filterCollections,
-      loading,
-      open,
-      close,
-      selectedCollection,
-    },
-  } = useGalleryContext();
+    collections,
+    categories,
+    selectedCategory,
+    filterCollections,
+    loading,
+    open,
+    close,
+    selectedCollection,
+  } = useCollections(search);
+
+  const slides: LightboxSlideItem[] = useMemo(() => {
+    if (!selectedCollection) return [];
+
+    const allPhotos = [
+      selectedCollection.cover_photo,
+      ...(selectedCollection.preview_photos || []),
+    ];
+
+    const seen = new Set<string>();
+    const uniquePhotos = allPhotos.filter((photo) => {
+      if (!photo || seen.has(photo.id)) return false;
+      seen.add(photo.id);
+      return true;
+    });
+
+    return uniquePhotos.map((photo) => ({
+      id: photo.id,
+      url: photo.urls.regular,
+      alt: selectedCollection.title,
+      title: selectedCollection.title,
+      subtitle: `${selectedCollection.total_photos} Photos · Curated by ${selectedCollection.user.name}`,
+    }));
+  }, [selectedCollection]);
 
   return (
     <>
       <div className="collections-header">
         <h1 className="collections-title">Curated Collections</h1>
-
         <p className="collections-description">
           Explore thematic sets of visual narratives hand-picked by our
           editorial team.
@@ -57,8 +83,15 @@ const Collections = () => {
           ))
         )}
       </div>
+
       {selectedCollection && (
-        <CollectionLightbox collection={selectedCollection} onClose={close} />
+        <Suspense fallback={null}>
+          <Lightbox
+            slides={slides}
+            initialSlide={0}
+            onClose={close}
+          />
+        </Suspense>
       )}
     </>
   );

@@ -1,15 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.scss'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import "./styles/globals.scss";
-import router from './routes/AppRouter.tsx';
-import { RouterProvider } from 'react-router-dom';
-import { GalleryProvider } from './context/GalleryContext.tsx';
+import AppRouter from "./routes/AppRouter";
+import { GalleryProvider } from "./context/GalleryContext";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GalleryProvider>
-      <RouterProvider router={router} />
+      <AppRouter />
     </GalleryProvider>
-  </StrictMode>,
-)
+  </StrictMode>
+);

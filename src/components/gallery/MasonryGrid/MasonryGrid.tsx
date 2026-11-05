@@ -1,11 +1,7 @@
 import { memo } from "react";
-
 import Masonry from "@mui/lab/Masonry";
-
 import type { Image } from "../../../types/image";
-
 import ImageCard from "../ImageCard/ImageCard";
-
 import "./MasonryGrid.scss";
 
 interface MasonryGridProps {
@@ -15,7 +11,8 @@ interface MasonryGridProps {
 
 const MasonryGrid = ({ images, onImageClick }: MasonryGridProps) => {
   return (
-    <Masonry className="masonry-grid"
+    <Masonry
+      className="masonry-grid"
       columns={{
         xs: 1,
         sm: 2,
@@ -37,24 +34,7 @@ const MasonryGrid = ({ images, onImageClick }: MasonryGridProps) => {
         />
       ))}
     </Masonry>
-
-    // <section className="masonry-grid">
-    //         {
-    //             images.map((image, index) => (
-
-    //                 <ImageCard
-    //                     key={image.id}
-    //                     image={image}
-    //                     index={index}
-    //                     onClick={onImageClick}
-    //                 />
-
-    //             ))
-    //         }
-    //     </section>
   );
 };
 
 export default memo(MasonryGrid);
-
-

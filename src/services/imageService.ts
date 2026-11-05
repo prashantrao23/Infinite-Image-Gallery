@@ -1,20 +1,16 @@
 import api from "./api";
-
 import type { Image } from "../types/image";
-import type {
-  ImageResponse,
-  SearchImagesResponse,
-} from "../types/api";
-
-const PER_PAGE = 20;
+import type { ImageResponse, SearchImagesResponse } from "../types/api";
+import { IMAGES_PER_PAGE } from "../utils/constants";
 
 export const getImages = async (
-  page = 1
+  page = 1,
+  perPage = IMAGES_PER_PAGE
 ): Promise<ImageResponse> => {
   const { data } = await api.get<Image[]>("/photos", {
     params: {
       page,
-      per_page: PER_PAGE,
+      per_page: perPage,
     },
   });
 
@@ -26,19 +22,16 @@ export const getImages = async (
 
 export const searchImages = async (
   query: string,
-  page = 1
+  page = 1,
+  perPage = IMAGES_PER_PAGE
 ): Promise<ImageResponse> => {
-  const { data } =
-    await api.get<SearchImagesResponse>(
-      "/search/photos",
-      {
-        params: {
-          query,
-          page,
-          per_page: PER_PAGE,
-        },
-      }
-    );
+  const { data } = await api.get<SearchImagesResponse>("/search/photos", {
+    params: {
+      query,
+      page,
+      per_page: perPage,
+    },
+  });
 
   return {
     images: data.results,

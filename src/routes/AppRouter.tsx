@@ -1,8 +1,10 @@
-import { createBrowserRouter } from "react-router-dom";
-
+import { lazy, Suspense } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
-import Home from "../pages/Home";
-import Collections from "../pages/Collections";
+import SkeletonGallery from "../components/gallery/SkeletonGallery/SkeletonGallery";
+
+const Home = lazy(() => import("../pages/Home"));
+const Collections = lazy(() => import("../pages/Collections"));
 
 const router = createBrowserRouter([
   {
@@ -11,14 +13,26 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: (
+          <Suspense fallback={<SkeletonGallery />}>
+            <Home />
+          </Suspense>
+        ),
       },
       {
         path: "collections",
-        element: <Collections />,
+        element: (
+          <Suspense fallback={<SkeletonGallery />}>
+            <Collections />
+          </Suspense>
+        ),
       },
     ],
   },
 ]);
 
-export default router;
+const AppRouter = () => {
+  return <RouterProvider router={router} />;
+};
+
+export default AppRouter;

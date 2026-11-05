@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-
 import useDebounce from "./useDebounce";
 import useInfiniteScroll from "./useInfiniteScroll";
-
 import { getImages, searchImages } from "../services/imageService";
-
 import type { Image } from "../types/image";
-
 import { DEBOUNCE_DELAY } from "../utils/constants";
 import { deduplicateImages } from "../utils/deduplicateImages";
 
@@ -23,63 +19,74 @@ export const IMAGE_CATEGORIES = [
   "Art",
 ] as const;
 
+export type ImageCategory = (typeof IMAGE_CATEGORIES)[number];
+
 const useGallery = (search: string) => {
-  // const [search, setSearch] = useState("");
   const [images, setImages] = useState<Image[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const categories = IMAGE_CATEGORIES;
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 
-  const fetchImages = useCallback(
-    async (currentPage: number, reset = false) => {
+  // Initial fetch / search query fetch
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchInitialImages = async () => {
       setLoading(true);
-
       try {
-        const response = debouncedSearch
-          ? await searchImages(debouncedSearch, currentPage)
-          : await getImages(currentPage);
+        const query = debouncedSearch.trim();
+        const response = query
+          ? await searchImages(query, 1)
+          : await getImages(1);
 
-        setImages((prev) =>
-          reset
-            ? response.images
-            : deduplicateImages([
-              ...prev,
-              ...response.images,
-            ])
-        );
-
-        setHasMore(currentPage < response.totalPages);
+        if (!isCancelled) {
+          setImages(deduplicateImages(response.images));
+          setPage(1);
+          setHasMore(1 < response.totalPages);
+        }
       } catch (error) {
-        console.error("Failed to fetch images:", error);
+        if (!isCancelled) {
+          console.error("Failed to fetch images:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
-    },
-    [debouncedSearch]
-  );
+    };
 
-  useEffect(() => {
-    setPage(1);
-    setHasMore(true);
+    fetchInitialImages();
 
-    fetchImages(1, true);
-  }, [debouncedSearch, fetchImages]);
+    return () => {
+      isCancelled = true;
+    };
+  }, [debouncedSearch]);
 
-  useEffect(() => {
-    if (page === 1) return;
-
-    fetchImages(page);
-  }, [page, fetchImages]);
-
-  const loadMore = useCallback(() => {
+  // Load next page
+  const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;
 
-    setPage((prev) => prev + 1);
-  }, [loading, hasMore]);
+    const nextPage = page + 1;
+    const query = debouncedSearch.trim();
+    setLoading(true);
+
+    try {
+      const response = query
+        ? await searchImages(query, nextPage)
+        : await getImages(nextPage);
+
+      setImages((prev) => deduplicateImages([...prev, ...response.images]));
+      setPage(nextPage);
+      setHasMore(nextPage < response.totalPages);
+    } catch (error) {
+      console.error("Failed to load more images:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, hasMore, page, debouncedSearch]);
 
   const loaderRef = useInfiniteScroll({
     hasMore,
@@ -92,11 +99,6 @@ const useGallery = (search: string) => {
     setSearch: (value: string) => void
   ) => {
     setSelectedCategory(category);
-
-    setImages([]);
-    setPage(1);
-    setHasMore(true);
-
     setSearch(category === "All" ? "" : category);
   };
 
@@ -105,9 +107,10 @@ const useGallery = (search: string) => {
     images,
     loading,
     loaderRef,
-    categories,
+    categories: IMAGE_CATEGORIES,
     selectedCategory,
-    filterByCategory
+    filterByCategory,
+    hasMore,
   };
 };
 

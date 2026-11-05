@@ -2,41 +2,35 @@ import {
   createContext,
   useContext,
   useState,
+  useCallback,
   type ReactNode,
 } from "react";
-
-import useGallery from "../hooks/useGallery";
-import useCollections from "../hooks/useCollections";
 
 interface GalleryContextType {
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
-  gallery: ReturnType<typeof useGallery>;
-  collections: ReturnType<typeof useCollections>;
+  clearSearch: () => void;
 }
 
-const GalleryContext = createContext<GalleryContextType | undefined>(
-  undefined
-);
+const GalleryContext = createContext<GalleryContextType | undefined>(undefined);
 
 interface GalleryProviderProps {
   children: ReactNode;
 }
 
-export const GalleryProvider = ({
-  children,
-}: GalleryProviderProps) => {
+export const GalleryProvider = ({ children }: GalleryProviderProps) => {
   const [search, setSearch] = useState("");
-  const gallery = useGallery(search);
-  const collections = useCollections(search);
+
+  const clearSearch = useCallback(() => {
+    setSearch("");
+  }, []);
 
   return (
     <GalleryContext.Provider
       value={{
-        gallery,
-        collections,
         search,
         setSearch,
+        clearSearch,
       }}
     >
       {children}
@@ -49,10 +43,10 @@ export const useGalleryContext = () => {
   const context = useContext(GalleryContext);
 
   if (!context) {
-    throw new Error(
-      "useGalleryContext must be used inside GalleryProvider"
-    );
+    throw new Error("useGalleryContext must be used inside GalleryProvider");
   }
 
   return context;
 };
+
+export default GalleryContext;

@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
 import { getCollections } from "../services/collectionService";
-
 import type { Collection } from "../types/collection";
 import { DEBOUNCE_DELAY } from "../utils/constants";
 import useDebounce from "./useDebounce";
@@ -10,12 +8,63 @@ const useCollections = (search: string) => {
   const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filteredCollections, setFilteredCollections] = useState<Collection[]>([]);
-
   const [selectedCategory, setSelectedCategory] = useState("All Collections");
+  const [selectedCollectionIndex, setSelectedCollectionIndex] = useState<number | null>(null);
 
-  const [selectedCollectionIndex, setSelectedCollectionIndex] =
-    useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchCollections = async () => {
+      setLoading(true);
+      try {
+        const data = await getCollections();
+        if (!cancelled) {
+          setCollections(data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to fetch collections:", error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchCollections();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const categories = useMemo(() => {
+    return [
+      "All Collections",
+      ...new Set(collections.map((c) => c.title)),
+    ];
+  }, [collections]);
+
+  const filteredCollections = useMemo(() => {
+    const query = debouncedSearch.trim().toLowerCase();
+    let nextCollections = collections;
+
+    if (selectedCategory !== "All Collections") {
+      nextCollections = nextCollections.filter(
+        (collection) => collection.title === selectedCategory
+      );
+    }
+
+    if (!query) {
+      return nextCollections;
+    }
+
+    return nextCollections.filter((collection) => {
+      const haystack = `${collection.title} ${collection.description ?? ""} ${collection.user.name}`.toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [collections, debouncedSearch, selectedCategory]);
 
   const open = (index: number) => {
     setSelectedCollectionIndex(index);
@@ -27,54 +76,8 @@ const useCollections = (search: string) => {
 
   const selectedCollection =
     selectedCollectionIndex !== null
-      ? collections[selectedCollectionIndex]
+      ? filteredCollections[selectedCollectionIndex] ?? null
       : null;
-
-  useEffect(() => {
-    const fetchCollections = async () => {
-      try {
-        const data = await getCollections();
-
-        setCollections(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCollections();
-  }, []);
-
-  useEffect(() => {
-    const query = debouncedSearch.trim().toLowerCase();
-    let nextCollections = collections;
-
-    if (selectedCategory !== "All Collections") {
-      nextCollections = nextCollections.filter(
-        (collection) => collection.title === selectedCategory
-      );
-    }
-
-    if (!query) {
-      setFilteredCollections(nextCollections);
-      return;
-    }
-
-    const filteredBySearch = nextCollections.filter((collection) => {
-      const haystack = `${collection.title} ${collection.description ?? ""} ${collection.user.name}`.toLowerCase();
-      return haystack.includes(query);
-    });
-
-    setFilteredCollections(filteredBySearch);
-  }, [collections, debouncedSearch, selectedCategory]);
-
-  const categories = useMemo(() => {
-    return [
-      "All Collections",
-      ...new Set(collections.map((c) => c.title)),
-    ];
-  }, [collections]);
 
   const filterCollections = (category: string) => {
     setSelectedCategory(category);
@@ -87,9 +90,9 @@ const useCollections = (search: string) => {
     filterCollections,
     loading,
     open,
+    close,
     selectedCollection,
     selectedCollectionIndex,
-    close,
   };
 };
 

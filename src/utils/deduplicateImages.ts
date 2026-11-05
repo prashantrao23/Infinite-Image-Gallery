@@ -1,14 +1,13 @@
 import type { Image } from "../types/image";
 
-export const deduplicateImages = (
-    images: Image[]
-) => {
+export const deduplicateById = <T extends { id: string }>(items: T[]): T[] => {
+  const map = new Map<string, T>();
+  items.forEach((item) => {
+    map.set(item.id, item);
+  });
+  return Array.from(map.values());
+};
 
-    const map = new Map();
-
-    images.forEach(image=>{
-        map.set(image.id,image);
-    });
-
-    return [...map.values()];
+export const deduplicateImages = (images: Image[]): Image[] => {
+  return deduplicateById(images);
 };

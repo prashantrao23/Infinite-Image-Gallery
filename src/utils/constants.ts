@@ -1,4 +1,5 @@
 export const IMAGES_PER_PAGE = 20;
+export const COLLECTIONS_PER_PAGE = 12;
 
 export const DEBOUNCE_DELAY = 500;
 
