@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Image } from "../../../types/image";
+import type { Image } from "@/types/image";
 import "./ImageCard.scss";
 
 interface ImageCardProps {
@@ -32,20 +32,20 @@ const ImageCard = ({ image, index, onClick }: ImageCardProps) => {
         onClick={() => onClick(index)}
         onKeyDown={handleKeyDown}
         onMouseEnter={() => preloadImage(image.urls.regular)}
-        aria-label={`View photo by ${image.user.name}`}
+        aria-label={`View photograph by ${image.user.name}`}
       >
         <div
           className="image-wrapper"
           style={{
             aspectRatio: `${image.width} / ${image.height}`,
-            backgroundColor: image.color || "#e8e8e8",
+            backgroundColor: image.color || "var(--bg-surface)",
           }}
         >
           <img
             src={image.urls.small}
             srcSet={`${image.urls.small} 400w, ${image.urls.regular} 1080w`}
             sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            alt={image.alt_description ?? `Photo by ${image.user.name}`}
+            alt={image.alt_description ?? `Photograph by ${image.user.name}`}
             loading="lazy"
             decoding="async"
             className={isLoaded ? "loaded" : ""}
@@ -54,7 +54,7 @@ const ImageCard = ({ image, index, onClick }: ImageCardProps) => {
         </div>
 
         <div className="image-info">
-          <h4>{image.user.name}</h4>
+          <span className="photographer">{image.user.name}</span>
         </div>
       </article>
     </div>

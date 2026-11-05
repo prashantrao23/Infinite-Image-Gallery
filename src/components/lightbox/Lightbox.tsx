@@ -8,7 +8,6 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 
 import "./Lightbox.scss";
-import closeIcon from "../../assets/close.svg";
 
 export interface LightboxSlideItem {
   id: string;
@@ -22,12 +21,14 @@ export interface LightboxProps {
   slides: LightboxSlideItem[];
   initialSlide?: number;
   onClose: () => void;
+  loading?: boolean;
 }
 
 export const Lightbox = ({
   slides,
   initialSlide = 0,
   onClose,
+  loading = false,
 }: LightboxProps) => {
   const [activeIndex, setActiveIndex] = useState<number>(initialSlide);
 
@@ -51,25 +52,49 @@ export const Lightbox = ({
 
   if (!slides || slides.length === 0) return null;
 
-  const activeSlide = slides[activeIndex] ?? slides[0];
+  const currentActiveIndex = Math.min(activeIndex, slides.length - 1);
+  const activeSlide = slides[currentActiveIndex] ?? slides[0];
 
   return (
-    <div className="lightbox" role="dialog" aria-modal="true">
+    <div className="lightbox" role="dialog" aria-modal="true" aria-label="Exhibition view">
       <button
         className="lightbox-close"
         onClick={onClose}
-        aria-label="Close lightbox"
+        aria-label="Close exhibition view"
       >
-        <img src={closeIcon} alt="close" />
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </button>
 
+      {loading && (
+        <div className="lightbox-loader" role="status" aria-live="polite">
+          <div className="lightbox-spinner" />
+          <span>Fetching series…</span>
+        </div>
+      )}
+
       <Swiper
+        key={`swiper-${slides.length}`}
         modules={[Navigation, Keyboard, Zoom]}
-        initialSlide={initialSlide}
+        initialSlide={currentActiveIndex}
         slidesPerView={1}
         navigation
+        observer={true}
+        observeParents={true}
         keyboard={{ enabled: true }}
-        zoom={{ maxRatio: 5 }}
+        zoom={{ maxRatio: 4 }}
         onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
         className="lightbox-swiper"
       >
@@ -78,7 +103,7 @@ export const Lightbox = ({
             <div className="swiper-zoom-container">
               <img
                 src={slide.url}
-                alt={slide.alt || slide.title || "Gallery image"}
+                alt={slide.alt || slide.title || "Exhibition photograph"}
                 loading="lazy"
                 decoding="async"
               />
@@ -87,10 +112,10 @@ export const Lightbox = ({
         ))}
       </Swiper>
 
-      {activeSlide && (activeSlide.title || activeSlide.subtitle) && (
+      {activeSlide && (
         <div className="lightbox-footer">
-          {activeSlide.title && <h3>{activeSlide.title}</h3>}
-          {activeSlide.subtitle && <p>{activeSlide.subtitle}</p>}
+          {activeSlide.title && <h3 className="slide-title">{activeSlide.title}</h3>}
+          {activeSlide.subtitle && <p className="slide-meta">{activeSlide.subtitle}</p>}
         </div>
       )}
     </div>
@@ -98,4 +123,3 @@ export const Lightbox = ({
 };
 
 export default Lightbox;
-

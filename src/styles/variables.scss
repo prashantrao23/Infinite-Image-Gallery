@@ -1,15 +1,32 @@
 :root {
+  /* Graphite Darkroom Neutral Ramp */
+  --bg-deep: #0f0f10;
+  --bg-page: #141415;
+  --bg-surface: #19191b;
+  --bg-raised: #232325;
+  --bg-raised-hover: #2b2b2e;
 
-    --primary: #2563eb;
-    --secondary: #0f172a;
+  /* Text Roles */
+  --text-primary: #ededed;
+  --text-secondary: #a1a1a6;
+  --text-muted: #85858b;
 
-    --background: #ffffff;
+  /* Hairlines & Borders (neutral text at 8% and 16% opacity) */
+  --border-subtle: rgba(237, 237, 237, 0.08);
+  --border-hover: rgba(237, 237, 237, 0.16);
+  --border-focus: rgba(237, 237, 237, 0.32);
 
-    --text: #222;
+  /* Accent (Exhibition off-white highlight) */
+  --accent: #ededed;
+  --accent-contrast: #141415;
 
-    --border: #e5e7eb;
+  /* Radii scale (nested math) */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 
-    --radius: 12px;
-
-    --transition: .25s ease;
+  /* Motion tokens */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration-base: 200ms;
 }

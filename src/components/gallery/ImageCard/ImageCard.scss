@@ -1,32 +1,32 @@
 .image-card-container {
-  padding: 0.5rem;
-  margin: 0px !important;
+  padding: 6px;
+  margin: 0 !important;
 }
 
 .image-card {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
-  background: #f4f4f4;
-  box-shadow: 0 8px 20px rgb(0 0 0 / 8%);
-  height: fit-content;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
   outline: none;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
 
   &:hover,
   &:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgb(0 0 0 / 12%);
+    border-color: var(--border-hover);
+    background-color: var(--bg-raised);
 
-    img {
-      transform: scale(1.02);
+    .image-info .photographer {
+      color: var(--text-primary);
     }
+  }
 
-    .image-info {
-      opacity: 1;
-      visibility: visible;
-    }
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
   }
 
   .image-wrapper {
@@ -40,7 +40,7 @@
       display: block;
       object-fit: cover;
       opacity: 0;
-      transition: opacity 0.35s ease, transform 0.3s ease;
+      transition: opacity var(--duration-base) var(--ease-out);
 
       &.loaded {
         opacity: 1;
@@ -49,29 +49,27 @@
   }
 
   .image-info {
-    padding: 1.125rem;
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    right: 0;
-    z-index: 1;
-    height: fit-content;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
 
-    h4 {
-      color: #fff;
-      font-size: 0.875rem;
-      font-weight: 500;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    .photographer {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color var(--duration-fast) var(--ease-out);
     }
   }
 }
 
 @media (min-width: 768px) {
   .image-card-container {
-    padding: 1rem;
+    padding: 8px;
   }
 }

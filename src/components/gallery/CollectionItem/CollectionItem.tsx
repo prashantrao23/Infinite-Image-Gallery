@@ -1,4 +1,5 @@
-import type { Collection } from "../../../types/collection";
+import type { Collection } from "@/types/collection";
+import arrowIcon from "@/assets/arrow.svg";
 import "./CollectionItem.scss";
 
 interface CollectionItemProps {
@@ -23,12 +24,12 @@ const CollectionItem = ({
     collection.cover_photo?.urls?.small ||
     collection.cover_photo?.urls?.regular ||
     "";
-  const coverBg = collection.cover_photo?.color || "#e8e8e8";
+  const coverBg = collection.cover_photo?.color || "var(--bg-raised)";
   const previewPhotos = (collection.preview_photos || []).slice(1, 4);
 
   return (
     <article
-      className="collection-item"
+      className="collection-card"
       role="button"
       tabIndex={0}
       onClick={() => onCollectionClick(index)}
@@ -51,11 +52,11 @@ const CollectionItem = ({
           <div
             key={`${photo.id}-${i}`}
             className={`img-box div${i + 2}`}
-            style={{ backgroundColor: photo.color || "#e8e8e8" }}
+            style={{ backgroundColor: photo.color || "var(--bg-raised)" }}
           >
             <img
               src={photo.urls.small}
-              alt={collection.title}
+              alt=""
               loading="lazy"
               decoding="async"
             />
@@ -64,9 +65,13 @@ const CollectionItem = ({
       </div>
 
       <div className="collection-info">
-        <h3 className="collection-title">{collection.title}</h3>
-        <p className="collection-description">
-          {collection.total_photos} Photos · Curated by {collection.user.name}
+        <div className="title-row">
+          <h3 className="collection-title">{collection.title}</h3>
+          <img src={arrowIcon} alt="" className="arrow-icon" aria-hidden="true" />
+        </div>
+        <p className="collection-meta">
+          <span className="count">{collection.total_photos} photos</span>
+          <span className="curator">Curated by {collection.user.name}</span>
         </p>
       </div>
     </article>

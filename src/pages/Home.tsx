@@ -26,12 +26,12 @@ const Home = () => {
 
   const slides: LightboxSlideItem[] = useMemo(
     () =>
-      images.map((img) => ({
+      images.map((img, index) => ({
         id: img.id,
         url: img.urls.regular,
-        alt: img.alt_description ?? `Photo by ${img.user.name}`,
-        title: img.user.name,
-        subtitle: `${img.width} × ${img.height}`,
+        alt: img.alt_description ?? `Photograph by ${img.user.name}`,
+        title: `Photograph by ${img.user.name}`,
+        subtitle: `${index + 1} of ${images.length} · ${img.width} × ${img.height}px`,
       })),
     [images]
   );

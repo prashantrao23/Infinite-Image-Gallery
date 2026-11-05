@@ -19,11 +19,25 @@ const Collections = () => {
     open,
     close,
     selectedCollection,
+    collectionPhotos,
+    loadingPhotos,
   } = useCollections(search);
 
   const slides: LightboxSlideItem[] = useMemo(() => {
     if (!selectedCollection) return [];
 
+    // When full collection photos are loaded, show all photos
+    if (collectionPhotos.length > 0) {
+      return collectionPhotos.map((photo, index) => ({
+        id: photo.id,
+        url: photo.urls.regular,
+        alt: photo.alt_description ?? `${selectedCollection.title} - photo ${index + 1}`,
+        title: photo.user?.name ? `Photo by ${photo.user.name}` : selectedCollection.title,
+        subtitle: `${index + 1} of ${collectionPhotos.length} · ${selectedCollection.title}`,
+      }));
+    }
+
+    // Fallback: show preview photos while the full collection photos are fetching
     const allPhotos = [
       selectedCollection.cover_photo,
       ...(selectedCollection.preview_photos || []),
@@ -36,22 +50,21 @@ const Collections = () => {
       return true;
     });
 
-    return uniquePhotos.map((photo) => ({
+    return uniquePhotos.map((photo, index) => ({
       id: photo.id,
       url: photo.urls.regular,
       alt: selectedCollection.title,
       title: selectedCollection.title,
-      subtitle: `${selectedCollection.total_photos} Photos · Curated by ${selectedCollection.user.name}`,
+      subtitle: `${index + 1} of ${uniquePhotos.length} · Curated by ${selectedCollection.user.name}`,
     }));
-  }, [selectedCollection]);
+  }, [selectedCollection, collectionPhotos]);
 
   return (
     <>
       <div className="collections-header">
-        <h1 className="collections-title">Curated Collections</h1>
+        <h1 className="collections-title">Collections</h1>
         <p className="collections-description">
-          Explore thematic sets of visual narratives hand-picked by our
-          editorial team.
+          Thematic series and photo essays from independent photographers.
         </p>
       </div>
 
@@ -90,6 +103,7 @@ const Collections = () => {
             slides={slides}
             initialSlide={0}
             onClose={close}
+            loading={loadingPhotos}
           />
         </Suspense>
       )}

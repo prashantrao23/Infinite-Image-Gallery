@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { getCollections } from "../services/collectionService";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { getCollections, getAllCollectionPhotos } from "../services/collectionService";
 import type { Collection } from "../types/collection";
+import type { Image } from "../types/image";
 import { DEBOUNCE_DELAY } from "../utils/constants";
 import useDebounce from "./useDebounce";
 
@@ -10,6 +11,10 @@ const useCollections = (search: string) => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All Collections");
   const [selectedCollectionIndex, setSelectedCollectionIndex] = useState<number | null>(null);
+
+  const [collectionPhotos, setCollectionPhotos] = useState<Image[]>([]);
+  const [loadingPhotos, setLoadingPhotos] = useState(false);
+  const photosCache = useRef<Map<string, Image[]>>(new Map());
 
   useEffect(() => {
     let cancelled = false;
@@ -66,18 +71,61 @@ const useCollections = (search: string) => {
     });
   }, [collections, debouncedSearch, selectedCategory]);
 
+  const selectedCollection =
+    selectedCollectionIndex !== null
+      ? filteredCollections[selectedCollectionIndex] ?? null
+      : null;
+
+  useEffect(() => {
+    if (!selectedCollection) return;
+
+    let isCancelled = false;
+    const cached = photosCache.current.get(selectedCollection.id);
+
+    const fetchPhotos = async () => {
+      if (cached) {
+        setCollectionPhotos(cached);
+        return;
+      }
+
+      setLoadingPhotos(true);
+      try {
+        const photos = await getAllCollectionPhotos(
+          selectedCollection.id,
+          selectedCollection.total_photos
+        );
+
+        if (!isCancelled) {
+          photosCache.current.set(selectedCollection.id, photos);
+          setCollectionPhotos(photos);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("Failed to fetch collection photos:", error);
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoadingPhotos(false);
+        }
+      }
+    };
+
+    fetchPhotos();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedCollection]);
+
   const open = (index: number) => {
     setSelectedCollectionIndex(index);
   };
 
   const close = () => {
     setSelectedCollectionIndex(null);
+    setCollectionPhotos([]);
+    setLoadingPhotos(false);
   };
-
-  const selectedCollection =
-    selectedCollectionIndex !== null
-      ? filteredCollections[selectedCollectionIndex] ?? null
-      : null;
 
   const filterCollections = (category: string) => {
     setSelectedCategory(category);
@@ -93,6 +141,8 @@ const useCollections = (search: string) => {
     close,
     selectedCollection,
     selectedCollectionIndex,
+    collectionPhotos,
+    loadingPhotos,
   };
 };
 
